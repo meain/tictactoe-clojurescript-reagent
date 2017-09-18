@@ -28,6 +28,8 @@
                         j (range board-size)
                         :when (= (get-in board [i j]) 0)]
                     [i j])]
+        (if (= (count remaining) 0)
+          (swap! app-state assoc :win "draw"))
         ))
 
 (defn computer-move []
@@ -52,8 +54,11 @@
                      (if (= color "grey")
                      ; (swap! app-state assoc-in [:board i j] (inc (get-in @app-state [:board i j])))))}])
                      (swap! app-state assoc-in [:board i j] 1))
-                     (computer-move)
-                     )}])
+                     (check-state)
+                     (if (not= (:win @app-state) "draw")
+                       (computer-move)
+                       (check-state)
+                       ))}])
 
 (defn blank [i j]
   (block "grey" i j))
@@ -83,6 +88,7 @@
    [:div.clearfix {:style {:clear "both"}}]
    [:h3 {:style {:width "100%" :text-align "center"}} "Let us play some "
     [:code {:style {:font-family "cursive"}} "tic-tac-toe"] " now"]
+   [:center [:div {:style {:font-size "20px"}} (:win @app-state)]]
    [:div.play-area {:style {:width (str (* 110 board-size) "px")
                             :height (str (* 110 board-size) "px")
                             :background-color "#ded"
@@ -91,7 +97,9 @@
     ]
    [:center
     [:button {:on-click (fn [e] 
-                          (swap! app-state assoc :board (make-board board-size)))
+                          (swap! app-state assoc :board (make-board board-size))
+                          (swap! app-state assoc :win "none")
+                          )
               :style {:font-size "30px"
                       :font-family "monaco, monospace"
                       :margin-top "20px"}} "New Game"]]])
