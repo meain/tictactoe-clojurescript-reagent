@@ -51,7 +51,7 @@
                  :height "100px"
                  :border "5px solid #fff"}
          :on-click (fn [e]
-                     (if (= color "#f5f5f5")  ;; kinda hacky
+                     (if (= 0 (get-in @app-state [:board i j]))
                      ; (swap! app-state assoc-in [:board i j] (inc (get-in @app-state [:board i j])))))}])
                      ((swap! app-state assoc-in [:board i j] 1)
                      (check-state)
