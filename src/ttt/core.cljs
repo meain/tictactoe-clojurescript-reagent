@@ -22,14 +22,37 @@
   (println (:board @app-state)))
 ; (println (range(count (:board @app-state))))
 
+(defn check-win "Check for win and lose conditions" [user computer]
+  (println user)
+  (println computer)
+  ; (println (for [el user] (first el)))
+  ; (println (for [freq (frequencies (for [el user] (first el)))] (second freq)))
+  (if (or (some #(= 3 %) (for [freq (frequencies (for [el user] (first el)))] (second freq)))
+          (some #(= 3 %) (for [freq (frequencies (for [el user] (second el)))] (second freq))))
+    (swap! app-state assoc :win "win"))
+  (if (or (some #(= 3 %) (for [freq (frequencies (for [el computer] (first el)))] (second freq)))
+          (some #(= 3 %) (for [freq (frequencies (for [el computer] (second el)))] (second freq))))
+    (swap! app-state assoc :win "lose"))
+  (println "     ")
+  )
+
 (defn check-state []
   (let [board (:board @app-state)
         remaining (for [i (range board-size)
                         j (range board-size)
                         :when (= (get-in board [i j]) 0)]
-                    [i j])]
+                    [i j])
+        user (for [i (range board-size)
+                   j (range board-size)
+                   :when (= (get-in board [i j]) 1)]
+               [i j])
+        computer (for [i (range board-size)
+                       j (range board-size)
+                       :when (= (get-in board [i j]) 2)]
+                   [i j])]
         (if (= (count remaining) 0)
           (swap! app-state assoc :win "draw"))
+        (check-win user computer)
         ))
 
 (defn computer-move []
@@ -43,6 +66,7 @@
         path (into [:board] move)]
     (swap! app-state assoc-in path 2)
     )
+  (check-state)
   )
 
 (defn block [color i j]
@@ -51,14 +75,12 @@
                  :height "100px"
                  :border "5px solid #fff"}
          :on-click (fn [e]
-                     (if (= 0 (get-in @app-state [:board i j]))
-                     ; (swap! app-state assoc-in [:board i j] (inc (get-in @app-state [:board i j])))))}])
+                     (if (and (= 0 (get-in @app-state [:board i j])) (= (:win @app-state) "none"))
                      ((swap! app-state assoc-in [:board i j] 1)
                      (check-state)
-                     (if (not= (:win @app-state) "draw")
+                     (if (= (:win @app-state) "none")
                        (computer-move)
-                       (check-state))
-                       )))}])
+                       ))))}])
 
 (defn blank [i j]
   (block "#f5f5f5" i j))
