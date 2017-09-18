@@ -3,8 +3,6 @@
 
 (enable-console-print!)
 
-; (println "Session started!")
-
 ;; 0 - blank
 ;; 1 - player one has played ( user )
 ;; 2 - player two has played ( computer )
@@ -12,29 +10,23 @@
   (vec (repeat n (vec (repeat n 0)))))
 
 (def board-size 3)
-(defonce app-state 
+(defonce app-state
   (atom {:text ":meain"
          :board (make-board board-size)
          ;; none win lose draw
          :win "none"}))
 
-(defn print-state []
-  (println (:board @app-state)))
-; (println (range(count (:board @app-state))))
-
 (defn check-win "Check for win and lose conditions" [user computer]
   (if (or (some #(= board-size %) (for [freq (frequencies (for [el user] (first el)))] (second freq)))
           (some #(= board-size %) (for [freq (frequencies (for [el user] (second el)))] (second freq)))
           (= board-size (get-in (frequencies (for [el user] (= (first el) (second el)))) [true]))
-          (= board-size (get-in (frequencies (for [el user] (= (first el) (- (- board-size (second el)) 1)))) [true]))
-          )
+          (= board-size (get-in (frequencies (for [el user] (= (first el) (- (- board-size (second el)) 1)))) [true])))
     (swap! app-state assoc :win "win"))
   (if (or (some #(= board-size %) (for [freq (frequencies (for [el computer] (first el)))] (second freq)))
-          (some #(= board-size %) (for [freq (frequencies (for [el computer] (second el)))] (second freq))))
+          (some #(= board-size %) (for [freq (frequencies (for [el computer] (second el)))] (second freq)))
           (= board-size (get-in (frequencies (for [el computer] (= (first el) (second el)))) [true]))
-          (= board-size (get-in (frequencies (for [el computer] (= (first el) (- (- board-size (second el)) 1)))) [true]))
+          (= board-size (get-in (frequencies (for [el computer] (= (first el) (- (- board-size (second el)) 1)))) [true])))
     (swap! app-state assoc :win "lose"))
-  (println "     ")
   )
 
 (defn check-state []
