@@ -51,30 +51,30 @@
                  :height "100px"
                  :border "5px solid #fff"}
          :on-click (fn [e]
-                     (if (= color "grey")
+                     (if (= color "#f5f5f5")  ;; kinda hacky
                      ; (swap! app-state assoc-in [:board i j] (inc (get-in @app-state [:board i j])))))}])
-                     (swap! app-state assoc-in [:board i j] 1))
+                     ((swap! app-state assoc-in [:board i j] 1)
                      (check-state)
                      (if (not= (:win @app-state) "draw")
                        (computer-move)
-                       (check-state)
-                       ))}])
+                       (check-state))
+                       )))}])
 
 (defn blank [i j]
-  (block "grey" i j))
+  (block "#f5f5f5" i j))
 (defn cross [i j]
-  (block "red" i j))
+  (block "#FF7043" i j))
 (defn circle [i j]
-  (block "gold" i j))
+  (block "#FFEE58" i j))
 
 (defn render-board []
 [:div {:style {:display "flex" :flex-wrap "wrap"}}
     (doall(for [i (range board-size)
           j (range board-size)]
       (case (get-in @app-state [:board i j])
-        0 ^{:key (str i j)} [blank i j]
-        1 ^{:key (str i j)} [cross i j]
-        2 ^{:key (str i j)} [circle i j]
+        0 ^{:key (str i "-" j)} [blank i j]
+        1 ^{:key (str i "-" j)} [cross i j]
+        2 ^{:key (str i "-" j)} [circle i j]
         )))
     ])
 
@@ -92,6 +92,7 @@
    [:div.play-area {:style {:width (str (* 110 board-size) "px")
                             :height (str (* 110 board-size) "px")
                             :background-color "#ded"
+                            :cursor "pointer"
                             :display "inline-block"}}
     [render-board]
     ]
@@ -111,4 +112,5 @@
   ;; optionally touch your app-state to force rerendering depending on
   ;; your application
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
+  (prn (:board @app-state))
   )
