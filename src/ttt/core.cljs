@@ -9,9 +9,9 @@
 (defn make-board "Creates a new board. n denotes the size." [n]
   (vec (repeat n (vec (repeat n 0)))))
 
-(def board-size 3)
+(def board-size 3)  ;; probably should have defined inside app-state
 (defonce app-state
-  (atom {:text ":meain"
+  (atom {:text ":game"
          :board (make-board board-size)
          ;; none win lose draw
          :win "none"}))
@@ -43,10 +43,10 @@
                        j (range board-size)
                        :when (= (get-in board [i j]) 2)]
                    [i j])]
-        (if (= (count remaining) 0)
-          (swap! app-state assoc :win "draw"))
-        (check-win user computer)
-        ))
+    (if (= (count remaining) 0)
+      (swap! app-state assoc :win "draw"))
+    (check-win user computer)
+    ))
 
 (defn computer-move []
   ;; choose a random unplayed block
@@ -69,11 +69,11 @@
                  :border "5px solid #fff"}
          :on-click (fn [e]
                      (if (and (= 0 (get-in @app-state [:board i j])) (= (:win @app-state) "none"))
-                     ((swap! app-state assoc-in [:board i j] 1)
-                     (check-state)
-                     (if (= (:win @app-state) "none")
-                       (computer-move)
-                       ))))}])
+                       ((swap! app-state assoc-in [:board i j] 1)
+                        (check-state)
+                        (if (= (:win @app-state) "none")
+                          (computer-move)
+                          ))))}])
 
 (defn blank [i j]
   (block "#f5f5f5" i j))
@@ -83,15 +83,15 @@
   (block "#FFEE58" i j))
 
 (defn render-board []
-[:div {:style {:display "flex" :flex-wrap "wrap"}}
-    (doall(for [i (range board-size)
-          j (range board-size)]
-      (case (get-in @app-state [:board i j])
-        0 ^{:key (str i "-" j)} [blank i j]
-        1 ^{:key (str i "-" j)} [cross i j]
-        2 ^{:key (str i "-" j)} [circle i j]
-        )))
-    ])
+  [:div {:style {:display "flex" :flex-wrap "wrap"}}
+   (doall(for [i (range board-size)
+               j (range board-size)]
+           (case (get-in @app-state [:board i j])
+             0 ^{:key (str i "-" j)} [blank i j]
+             1 ^{:key (str i "-" j)} [cross i j]
+             2 ^{:key (str i "-" j)} [circle i j]
+             )))
+   ])
 
 (defn app []
   [:div {:style {:text-align "center"}}
